@@ -91,7 +91,7 @@ def fetch_dataset(dataset, station, datum=None):
                 print(r.text)
                 with open('errors.txt', 'wb') as error_file:
                     error_file.write('{url}\n'.format(url=url))
-                time.sleep(5) # sleep a little, in case hitting server too hard
+                time.sleep(5)  # sleep a little, in case hitting server too hard
                 return False  # bail on error (other than no results)
             else:
                 empty_months += 1
@@ -115,14 +115,8 @@ for dataset in DATASETS:
             print('processing datum {datum}...'.format(datum=datum))
             for station in stations:
                 fetch_dataset(dataset, station, datum)
-                if not status:
-                    print('error')
-                    sys.exit(1)
     else:
         for station in stations:
-            status = fetch_dataset(dataset, station)
-            if not status:
-                print('error')
-                sys.exit(1)
+            fetch_dataset(dataset, station)
 
     print('\nAll done!')
