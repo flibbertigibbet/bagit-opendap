@@ -2,8 +2,10 @@
 
 import datetime
 import json
+import os
 import requests
 import sys
+import time
 
 BASE_URL = 'https://opendap.co-ops.nos.noaa.gov/erddap/tabledap/'
 
@@ -62,26 +64,37 @@ def fetch_dataset(dataset, station, datum=None):
         if datum:
             url += '&DATUM="{datum}"'.format(datum=datum)
 
+        fname = 'data/{dataset}_{station}_{begin}_{end}.json'.format(
+                dataset=dataset, station=station, begin=begin, end=end)
+
         # go to previous month on next iteration
         lom = fom - datetime.timedelta(days=1)
         fom = lom.replace(day=1)
 
+        # skip files already downloaded
+        if os.path.exists(fname):
+            print('already have {f}'.format(f=fname))
+            continue
+
         r = requests.get(url)
         if r.ok:
             # assumes local data directory exists
-            with open('data/{dataset}_{station}_{begin}_{end}.json'.format(
-                dataset=dataset, station=station, begin=begin, end=end), 'wb') as inf:
+            with open(fname, 'wb') as inf:
                 inf.write(r.text)
                 empty_months = 0
         else:
             if r.text.find('produced no matching results') == -1:
                 print('Error fetching URL {url}'.format(url=url))
                 print(r.text)
+                with open('errors.txt', 'wb') as error_file:
+                    error_file.write('{url}\n'.format(url=url))
+                time.sleep(5) # sleep a little, in case hitting server too hard
                 return False  # bail on error (other than no results)
             else:
                 empty_months += 1
                 if empty_months > 24:
-                    print('More than two years of empty data for {d} station {s}'.format(d=dataset, s=station))
+                    print('Saw more than two years of empty data for {d} station {s}'.format(d=dataset, s=station))
+                    print('Last date checked: {fom}'.format(fom=fom))
                     going = False
 
     return True
@@ -98,7 +111,7 @@ for dataset in DATASETS:
         for datum in DATUMS:
             print('processing datum {datum}...'.format(datum=datum))
             for station in stations:
-                status = fetch_dataset(dataset, station, datum)
+                fetch_dataset(dataset, station, datum)
                 if not status:
                     print('error')
                     sys.exit(1)
