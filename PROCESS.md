@@ -18,3 +18,11 @@ There are eleven dataset endpoints, one of which is `allDatasets`, which appears
  ## The Plan
 
 Query as JSON each month in the available data range (what is the available data range?) for each available station and datum.
+
+## Stations
+
+The front-end site queries for the list of all stations here: https://tidesandcurrents.noaa.gov/cgi-bin/stationbarsearch.cgi?&term=&type=active
+
+The responses contain just a `name` field that appears to be the station ID concatenated with the description.
+
+
