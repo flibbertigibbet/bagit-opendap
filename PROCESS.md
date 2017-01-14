@@ -25,4 +25,8 @@ The front-end site queries for the list of all stations here: https://tidesandcu
 
 The responses contain just a `name` field that appears to be the station ID concatenated with the description.
 
+109 months for air temp for 365 usable stations. ~800KB each, so ~30GB for that dataset.
+30 GB * 5 non-datum datasets +
+30 GB * 5 dataum datasets * 9 datums
 
+So rough estimate of ~1.5 terabytes for full database.
