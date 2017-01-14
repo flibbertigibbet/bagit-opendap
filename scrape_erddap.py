@@ -13,17 +13,17 @@ BASE_URL = 'https://opendap.co-ops.nos.noaa.gov/erddap/tabledap/'
 # https://opendap.co-ops.nos.noaa.gov/erddap/info/datasetID/index.json
 
 DATASETS = [
-    'IOOS_Air_Temperature',
-    'IOOS_Barometric_Pressure',
-    'IOOS_Conductivity',
-    'IOOS_Water_Temperature',
-    'IOOS_Wind',
     # water level datasets
     'IOOS_Raw_Water_Level',
     'IOOS_Daily_Verified_Water_Level',
     'IOOS_High_Low_Verified_Water_Level',
     'IOOS_Hourly_Height_Verified_Water_Level',
     'IOOS_SixMin_Verified_Water_Level',
+    'IOOS_Air_Temperature',
+    'IOOS_Barometric_Pressure',
+    'IOOS_Conductivity',
+    'IOOS_Water_Temperature',
+    'IOOS_Wind'
 ]
 
 # datums used by the water level datasets
@@ -61,11 +61,14 @@ def fetch_dataset(dataset, station, datum=None):
             end=end
         )
 
+        fname = 'data/{dataset}_{station}_{begin}_{end}'.format(
+                dataset=dataset, station=station, begin=begin, end=end)
+
         if datum:
             url += '&DATUM="{datum}"'.format(datum=datum)
+            fname += '_{datum}'.format(datum=datum)
 
-        fname = 'data/{dataset}_{station}_{begin}_{end}.json'.format(
-                dataset=dataset, station=station, begin=begin, end=end)
+        fname += '.json'
 
         # go to previous month on next iteration
         lom = fom - datetime.timedelta(days=1)
